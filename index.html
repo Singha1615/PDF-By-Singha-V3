@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF By Singha</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="hdr">
+            <div class="logo-icon"><img src="assets/icons/pdf-by-singha.svg" alt=""></div>
+            <div class="logo-text">PDF <span>By</span> <span>Singha</span></div>
+            <label class="language-picker"><span class="sr-only" data-i18n="common.language">Language</span><select id="language-selector" aria-label="Language selector" onchange="setLanguage(this.value)"><option value="en">English</option><option value="km">ខ្មែរ</option><option value="th">ไทย</option></select></label>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1 data-i18n="hero.title">Your <span>PDF</span> helper</h1>
+        <p data-i18n="hero.description">Merge, split, convert, compress and prepare PDFs quickly and privately.</p>
+    </div>
+
+    <div class="tools-wrap">
+        <p class="sec-title" data-i18n="tools.title">Choose the <span>tool</span> you need</p>
+
+        <div class="tools-grid">
+            <div class="tc" onclick="openTool('merge')">
+                <div class="ti red"><img src="assets/icons/merge-pdf.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.merge">Merge PDF</div>
+            </div>
+            <div class="tc" onclick="openTool('split')">
+                <div class="ti blue"><img src="assets/icons/split-pdf.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.split">Split PDF</div>
+            </div>
+            <div class="tc" onclick="openTool('pdf2img')">
+                <div class="ti green"><img src="assets/icons/pdf-to-image.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.pdf2img">PDF to Image</div>
+            </div>
+            <div class="tc" onclick="openTool('img2pdf')">
+                <div class="ti orange"><img src="assets/icons/image-to-pdf.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.img2pdf">Image to PDF</div>
+            </div>
+            <div class="tc" onclick="openTool('grayscale')">
+                <div class="ti purple"><img src="assets/icons/grayscale-pdf.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.grayscale">Grayscale PDF</div>
+            </div>
+            <div class="tc" onclick="openTool('a4print')">
+                <div class="ti teal"><img src="assets/icons/a4-id-photo.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.a4print">A4 Photo / ID Photo</div>
+            </div>
+            <div class="tc" onclick="openTool('compress')">
+                <div class="ti pink"><img src="assets/icons/compress-pdf.svg" alt=""></div>
+                <div class="tn" data-i18n="tools.compress">Compress PDF</div>
+            </div>
+            <div class="tc">
+                <div class="ti white">
+                    <a href="https://generator.email" target="_blank" rel="noopener"><img src="assets/icons/email-generator.svg" alt=""></a>
+                </div>
+                <div class="tn" data-i18n="tools.email">Create an email</div>
+            </div>
+        </div>
+
+        <!-- ═══ MERGE ═══ -->
+        <div id="panel-merge" class="panel">
+            <div class="ph">
+                <div class="ti red" style="width:50px;height:50px"><img src="assets/icons/merge-pdf.svg" alt=""></div>
+                <div>
+                    <div class="pt" data-i18n="merge.title">Merge PDF</div>
+                    <div class="pd" data-i18n="merge.description">Combine multiple PDF files into one document.</div>
+                </div>
+            </div>
+            <div class="dz" id="dz-merge" ondragover="doDrag(event,'merge')" ondrop="doDrop(event,'merge')">
+                <input type="file" accept=".pdf" multiple onchange="addF(event,'merge')">
+                <div class="dz-icon"><img src="assets/icons/merge-pdf.svg" alt=""></div>
+                <h3 data-i18n="merge.dropTitle">Drop PDFs here</h3>
+                <p data-i18n="merge.dropDescription">Select multiple files</p>
+                <button class="btn-sel" onclick="event.stopPropagation()" data-i18n="common.selectFiles">Select files</button>
+            </div>
+            <section id="merge-preview-section" class="merge-preview-section" hidden aria-live="polite">
+                <p class="drag-hint" data-i18n="merge.dragHint">Drag PDF cards to change the merge order.</p>
+                <div class="merge-grid" id="merge-grid"></div>
+            </section>
+            <button class="pbtn" id="btn-merge" onclick="mergePDFs()">🔗 <span data-i18n="merge.button">Merge PDF</span></button>
+            <div class="prog-wrap" id="pg-merge">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-merge"></div>
+                </div>
+                <div class="prog-txt" id="pgt-merge"></div>
+            </div>
+            <div class="res" id="res-merge"></div>
+        </div>
+
+        <!-- ═══ SPLIT ═══ -->
+        <div id="panel-split" class="panel">
+            <div class="ph">
+                <div class="ti blue" style="width:50px;height:50px"><img src="assets/icons/split-pdf.svg" alt=""></div>
+                <div>
+                    <div class="pt">ចែក PDF</div>
+                    <div class="pd">ចែក PDF ជាឯកសារច្រើន ឬជ្រើសទំព័រ</div>
+                </div>
+            </div>
+            <div class="dz" id="dz-split" ondragover="doDrag(event,'split')" ondrop="doDrop(event,'split')">
+                <input type="file" accept=".pdf" onchange="addF(event,'split')">
+                <div class="dz-icon"><img src="assets/icons/split-pdf.svg" alt=""></div>
+                <h3>ទម្លាក់ PDF នៅទីនេះ</h3>
+                <p>PDF ១ ឯកសារ</p>
+                <button class="btn-sel" onclick="event.stopPropagation()">ជ្រើស PDF</button>
+            </div>
+            <div class="flist" id="fl-split"></div>
+            <div class="srow" id="split-settings" style="display:none">
+                <div class="sg"><label>របៀប</label>
+                    <select id="split-mode" onchange="onSplitMode()">
+          <option value="all">ចែករៀងរាល់ទំព័រ</option>
+          <option value="range">ជ្រើសទំព័រ</option>
+          <option value="every">រៀងរាល់ N ទំព័រ</option>
+        </select></div>
+                <div class="sg" id="split-n-g" style="display:none"><label>ចែករៀងរាល់</label>
+                    <input type="number" id="split-n" value="1" min="1" style="width:60px"></div>
+            </div>
+            <div id="split-pg-preview" style="display:none">
+                <p style="font-size:11px;color:var(--muted);margin-top:10px">ចុចលើទំព័រ ដើម្បីជ្រើស/មិនជ្រើស</p>
+                <div class="pgrid" id="pgrid"></div>
+            </div>
+            <button class="pbtn" onclick="splitPDF()" id="btn-split" style="display:none">✂️ ចែកឥឡូវ</button>
+            <div class="prog-wrap" id="pg-split">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-split"></div>
+                </div>
+                <div class="prog-txt" id="pgt-split"></div>
+            </div>
+            <div class="res" id="res-split"></div>
+        </div>
+
+        <!-- ═══ PDF→IMG ═══ -->
+        <div id="panel-pdf2img" class="panel">
+            <div class="ph">
+                <div class="ti green" style="width:50px;height:50px"><img src="assets/icons/pdf-to-image.svg" alt=""></div>
+                <div>
+                    <div class="pt">PDF → រូបភាព</div>
+                    <div class="pd">បំប្លែង PDF ទំព័រនីមួយៗ → PNG ឬ JPG</div>
+                </div>
+            </div>
+            <div class="dz" id="dz-pdf2img" ondragover="doDrag(event,'pdf2img')" ondrop="doDrop(event,'pdf2img')">
+                <input type="file" accept=".pdf" onchange="addF(event,'pdf2img')">
+                <div class="dz-icon"><img src="assets/icons/pdf-to-image.svg" alt=""></div>
+                <h3>ទម្លាក់ PDF នៅទីនេះ</h3>
+                <p>PDF ១ ឯកសារ</p>
+                <button class="btn-sel" onclick="event.stopPropagation()">ជ្រើស PDF</button>
+            </div>
+            <div class="flist" id="fl-pdf2img"></div>
+            <div class="srow">
+                <div class="sg"><label>ទម្រង់</label>
+                    <select id="img-fmt"><option value="png">PNG</option><option value="jpeg">JPG</option></select></div>
+                <div class="sg"><label>DPI</label>
+                    <select id="img-dpi"><option value="1">72 DPI</option><option value="2" selected>150 DPI</option><option value="3">300 DPI</option></select></div>
+            </div>
+            <button class="pbtn" onclick="pdfToImgs()">🖼️ បំប្លែងឥឡូវ</button>
+            <div class="prog-wrap" id="pg-pdf2img">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-pdf2img"></div>
+                </div>
+                <div class="prog-txt" id="pgt-pdf2img"></div>
+            </div>
+            <div class="res" id="res-pdf2img"></div>
+        </div>
+
+        <!-- ═══ IMG→PDF ═══ -->
+        <div id="panel-img2pdf" class="panel">
+            <div class="ph">
+                <div class="ti orange" style="width:50px;height:50px"><img src="assets/icons/image-to-pdf.svg" alt=""></div>
+                <div>
+                    <div class="pt">រូបភាព → PDF</div>
+                    <div class="pd">បំប្លែងរូបភាព JPG/PNG ច្រើន ទៅជា PDF</div>
+                </div>
+            </div>
+            <div class="dz" id="dz-img2pdf" ondragover="doDrag(event,'img2pdf')" ondrop="doDrop(event,'img2pdf')">
+                <input type="file" accept="image/*" multiple onchange="addF(event,'img2pdf')">
+                <div class="dz-icon"><img src="assets/icons/image-to-pdf.svg" alt=""></div>
+                <h3>ទម្លាក់រូបភាព</h3>
+                <p>JPG, PNG, WEBP (ជ្រើសបានច្រើន)</p>
+                <button class="btn-sel" onclick="event.stopPropagation()">ជ្រើសរូបភាព</button>
+            </div>
+            <div class="flist" id="fl-img2pdf"></div>
+            <div class="srow">
+                <div class="sg"><label>ទំហំ</label><select id="i2p-sz"><option value="a4">A4</option><option value="letter">Letter</option><option value="fit">ស្របរូប</option></select></div>
+                <div class="sg"><label>ទិស</label><select id="i2p-or"><option value="auto">ស្វ័យប្រវត្តិ</option><option value="portrait">បញ្ឈរ</option><option value="landscape">សេរ</option></select></div>
+            </div>
+            <button class="pbtn" onclick="imgsToPDF()">📑 បំប្លែងឥឡូវ</button>
+            <div class="prog-wrap" id="pg-img2pdf">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-img2pdf"></div>
+                </div>
+                <div class="prog-txt" id="pgt-img2pdf"></div>
+            </div>
+            <div class="res" id="res-img2pdf"></div>
+        </div>
+
+        <!-- ═══ GRAYSCALE ═══ -->
+        <div id="panel-grayscale" class="panel">
+            <div class="ph">
+                <div class="ti purple" style="width:50px;height:50px"><img src="assets/icons/grayscale-pdf.svg" alt=""></div>
+                <div>
+                    <div class="pt">ប្រែ PDF ទៅខ្មៅ-ស</div>
+                    <div class="pd">ប្រែ PDF ពណ៌ → Grayscale</div>
+                </div>
+            </div>
+            <div class="dz" id="dz-grayscale" ondragover="doDrag(event,'grayscale')" ondrop="doDrop(event,'grayscale')">
+                <input type="file" accept=".pdf" onchange="addF(event,'grayscale')">
+                <div class="dz-icon"><img src="assets/icons/grayscale-pdf.svg" alt=""></div>
+                <h3>ទម្លាក់ PDF នៅទីនេះ</h3>
+                <p>PDF ១ ឯកសារ</p>
+                <button class="btn-sel" onclick="event.stopPropagation()">ជ្រើស PDF</button>
+            </div>
+            <div class="flist" id="fl-grayscale"></div>
+            <div style="margin-top:10px;background:#f9f0ff;border-radius:8px;padding:11px;font-size:12px;color:#6b21a8">
+                ℹ️ ការប្រែទៅខ្មៅ-ស នឹងបំប្លែង PDF ទំព័រទំព័រ ហើយស្ថាបនាជា PDF ថ្មី
+            </div>
+            <button class="pbtn" onclick="grayscalePDF()">🎨 ប្រែឥឡូវ</button>
+            <div class="prog-wrap" id="pg-grayscale">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-grayscale"></div>
+                </div>
+                <div class="prog-txt" id="pgt-grayscale"></div>
+            </div>
+            <div class="res" id="res-grayscale"></div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════
+       A4 PHOTO PRINT — MULTI PHOTO SUPPORT
+  ═══════════════════════════════════════════ -->
+        <div id="panel-a4print" class="panel">
+            <div class="ph">
+                <div class="ti teal" style="width:50px;height:50px"><img src="assets/icons/a4-id-photo.svg" alt=""></div>
+                <div>
+                    <div class="pt">រូបថត → A4</div>
+                    <div class="pd">ដាក់រូបថត ច្រើនរូប (3×4 ឬ 4×6) ក្នុង A4 ១ ទំព័រ · ត្រូវបានកាត់ Cover Crop ឲ្យជា</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Size -->
+            <span class="step-lbl">① ជ្រើសទំហំ</span>
+            <div class="size-row" id="size-row"></div>
+
+            <!-- Step 2: Photos -->
+            <span class="step-lbl">② ដាក់រូបភាព (ច្រើនរូបបាន · អូសប្ដូរ order បាន)</span>
+            <div class="photo-upload-area" id="pua" ondragover="puaDrag(event)" ondrop="puaDrop(event)">
+                <input type="file" accept="image/*" multiple onchange="addPhotos(event)" id="pua-input">
+                <div class="photo-upload-top">
+                    <div class="photo-upload-icon"><img src="assets/icons/a4-id-photo.svg" alt=""></div>
+                    <div class="photo-upload-text">
+                        <h3>ទម្លាក់រូបភាពនៅទីនេះ</h3>
+                        <p>JPG · PNG · WEBP · ជ្រើសបានច្រើនរូប · រូបនីមួយៗ cover-cropped ឲ្យបានជាទំហំ</p>
+                    </div>
+                    <button class="btn-sel" style="flex-shrink:0" onclick="event.stopPropagation()">ជ្រើសរូប</button>
+                </div>
+                <!-- Thumbnails rendered here -->
+                <div class="photos-grid" id="photos-grid" style="display:none"></div>
+                <div class="drag-hint" id="drag-hint" style="display:none">☝️ អូសប្ដូរលំដាប់រូបភាព</div>
+            </div>
+
+            <!-- Step 3: Options -->
+            <span class="step-lbl" style="margin-top:18px">③ ជម្រើស</span>
+            <div class="srow">
+                <div class="sg"><label>ចន្លោះ (mm)</label><input type="number" id="a4-gap" value="3" min="0" max="15" style="width:62px" oninput="updateA4Preview()"></div>
+                <div class="sg"><label>គែម (mm)</label><input type="number" id="a4-margin" value="8" min="0" max="25" style="width:62px" oninput="updateA4Preview()"></div>
+                <div class="sg"><label>បន្ទាត់កាត់</label>
+                    <select id="a4-cut" onchange="updateA4Preview()"><option value="yes">✂️ មាន</option><option value="no">គ្មាន</option></select></div>
+                <div class="sg"><label>ជ្រើសទំព័រ</label>
+                    <select id="a4-pages" onchange="updateA4Preview()">
+          <option value="1">1 ទំព័រ</option>
+          <option value="2">2 ទំព័រ</option>
+          <option value="all">តាមចំនួនរូប</option>
+        </select></div>
+            </div>
+
+            <!-- Preview -->
+            <div id="a4-preview-section" style="display:none">
+                <span class="step-lbl">④ Preview</span>
+                <div class="a4-preview-wrap">
+                    <div class="a4-canvas-col"><canvas id="a4-cv"></canvas></div>
+                    <div class="a4-stats-col">
+                        <div class="stat">
+                            <div class="stat-lbl">ទំហំរូបនីមួយៗ</div>
+                            <div class="stat-val" id="st-size">—</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-lbl">ចំនួនរូបបានដាក់</div>
+                            <div class="stat-val" id="st-placed">—</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-lbl">ប្លង់ (cols × rows)</div>
+                            <div class="stat-val" id="st-grid">—</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-lbl">ចំនួនទំព័រ A4</div>
+                            <div class="stat-val" id="st-pages">—</div>
+                        </div>
+                        <div class="note-box">
+                            ✂️ រូបត្រូវបាន <strong>Cover Crop</strong> ឲ្យបានត្រឹមត្រូវ ដោយគ្មាន stretch ។<br> 💡 អូស thumbnail ប្ដូរ order បាន
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="pbtn" onclick="a4PrintPDF()">🖨️ បង្កើត PDF ត្រៀមបោះពុម្ព</button>
+            <div class="prog-wrap" id="pg-a4print">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-a4print"></div>
+                </div>
+                <div class="prog-txt" id="pgt-a4print"></div>
+            </div>
+            <div class="res" id="res-a4print"></div>
+        </div>
+
+
+        <!-- ══════════════════════════════
+    PDF COMPRESS
+═══════════════════════════════════ -->
+        <div id="panel-compress" class="panel">
+            <div class="ph">
+                <div class="ti pink" style="width:50px;height:50px"><img src="assets/icons/compress-pdf.svg" alt=""></div>
+                <div>
+                    <div class="pt">ទម្លាក់ទំហំ PDF (PDF Compression)</div>
+                    <div class="pd">កាត់បន្ថយទំហំ PDF ដោយរក្សាគុណភាព</div>
+                </div>
+            </div>
+
+            <!-- Compression level -->
+            <span class="step-lbl">① ជ្រើសកម្រិតទម្លាក់ទំហំ</span>
+            <div class="compress-levels">
+                <div class="cl" id="cl-low" onclick="setCL('low')">
+                    <div class="cl-icon">🔵</div>
+                    <div class="cl-name">ស្រាល</div>
+                    <div class="cl-desc">JPG 85% · 144 DPI<br>ទំហំតូចបន្តិច<br>គុណភាពល្អ</div>
+                </div>
+                <div class="cl active" id="cl-med" onclick="setCL('med')">
+                    <div class="cl-icon">🟡</div>
+                    <div class="cl-name">មធ្យម</div>
+                    <div class="cl-desc">JPG 72% · 96 DPI<br>ទំហំតូចល្មមៗ<br>ល្អបំផុត</div>
+                </div>
+                <div class="cl" id="cl-high" onclick="setCL('high')">
+                    <div class="cl-icon">🔴</div>
+                    <div class="cl-name">ខ្លាំង</div>
+                    <div class="cl-desc">JPG 55% · 72 DPI<br>ទំហំតូចបំផុត<br>គុណភាពទាប</div>
+                </div>
+                <div class="cl" id="cl-max" onclick="setCL('max')">
+                    <div class="cl-icon">⚫</div>
+                    <div class="cl-name">Max</div>
+                    <div class="cl-desc">JPG 40% · 48 DPI<br>ទំហំតូចខ្លាំង<br>Email/ចែករំលែក</div>
+                </div>
+            </div>
+
+            <div class="dz" id="dz-compress" ondragover="doDrag(event,'compress')" ondrop="doDrop(event,'compress')">
+                <input type="file" accept=".pdf" onchange="addF(event,'compress')">
+                <div class="dz-icon"><img src="assets/icons/compress-pdf.svg" alt=""></div>
+                <h3>ទម្លាក់ PDF នៅទីនេះ</h3>
+                <p>PDF ១ ឯកសារ</p>
+                <button class="btn-sel" onclick="event.stopPropagation()">ជ្រើស PDF</button>
+            </div>
+            <div class="flist" id="fl-compress"></div>
+
+            <!-- Before/After estimate -->
+            <div id="compress-info" style="display:none;margin-top:14px;background:linear-gradient(135deg,#e8f4fd,#f0e8fd);border-radius:10px;padding:14px 16px;">
+                <div style="display:flex;gap:20px;flex-wrap:wrap">
+                    <div>
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)">ទំហំដើម</div>
+                        <div style="font-size:20px;font-weight:900" id="ci-orig">—</div>
+                    </div>
+                    <div style="font-size:20px;align-self:flex-end;color:var(--muted)">→</div>
+                    <div>
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)">ប្រហែល</div>
+                        <div style="font-size:20px;font-weight:900;color:var(--red)" id="ci-est">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="pbtn" onclick="compressPDF()">📦 ទម្លាក់ទំហំឥឡូវ</button>
+            <div class="prog-wrap" id="pg-compress">
+                <div class="prog-bg">
+                    <div class="prog-fill" id="pgf-compress"></div>
+                </div>
+                <div class="prog-txt" id="pgt-compress"></div>
+            </div>
+            <div class="res" id="res-compress"></div>
+        </div>
+
+    </div>
+    <!-- end .tools-wrap -->
+
+    <footer class="site-footer">
+        <span data-i18n="footer.privacy">© 2025 PDF By Singha — Private: your files never leave this browser.</span><br>
+        <span data-i18n="footer.contact">Contact us:</span> <a href="https://linksc4pe.netlify.app/" target="_blank" data-i18n="footer.link">Click here</a>
+    </footer>
+    <div class="notif" id="notif"></div>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
